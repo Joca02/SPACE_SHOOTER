@@ -36,6 +36,8 @@
             this.tmrEnemies5 = new System.Windows.Forms.Timer(this.components);
             this.tmr_my_bullets = new System.Windows.Forms.Timer(this.components);
             this.lblNoBullets = new System.Windows.Forms.Label();
+            this.tmrGenerate_EnemyShot = new System.Windows.Forms.Timer(this.components);
+            this.tmr_enemy_bullets = new System.Windows.Forms.Timer(this.components);
             this.SuspendLayout();
             // 
             // tmrEnemies
@@ -80,6 +82,17 @@
             this.lblNoBullets.TabIndex = 0;
             this.lblNoBullets.Text = "No Bullets Left";
             // 
+            // tmrGenerate_EnemyShot
+            // 
+            this.tmrGenerate_EnemyShot.Enabled = true;
+            this.tmrGenerate_EnemyShot.Interval = 5000;
+            this.tmrGenerate_EnemyShot.Tick += new System.EventHandler(this.tmrGenerate_EnemyShot_Tick);
+            // 
+            // tmr_enemy_bullets
+            // 
+            this.tmr_enemy_bullets.Enabled = true;
+            this.tmr_enemy_bullets.Tick += new System.EventHandler(this.tmr_enemy_bullets_Tick);
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -105,6 +118,8 @@
         private System.Windows.Forms.Timer tmrEnemies5;
         private System.Windows.Forms.Timer tmr_my_bullets;
         private System.Windows.Forms.Label lblNoBullets;
+        private System.Windows.Forms.Timer tmrGenerate_EnemyShot;
+        private System.Windows.Forms.Timer tmr_enemy_bullets;
     }
 }
 
