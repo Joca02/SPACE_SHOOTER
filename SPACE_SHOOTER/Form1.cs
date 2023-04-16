@@ -14,8 +14,10 @@ namespace SPACE_SHOOTER
     public partial class Form1 : Form
     {
         PictureBox player = new PictureBox();
-        PictureBox[][] enemies = new PictureBox[5][]; //5 redova neprijatelja
+        List<List<PictureBox>> enemies = new List<List<PictureBox>>(5);
         List<PictureBox> my_bullets= new List<PictureBox>();
+        const int longer_row = 5;
+        const int shorter_row = 3;
 
         public Form1()
         {
@@ -26,7 +28,8 @@ namespace SPACE_SHOOTER
 
             Width=800;
             Height=600;
-
+            lblNoBullets.Left=Width/2-lblNoBullets.Width/2;
+            lblNoBullets.Hide();
 
             //DEFINISEM SPACESHIP IGRACA
             /////////////////////////////////////////////////////////////////
@@ -39,15 +42,15 @@ namespace SPACE_SHOOTER
             ////////////////////////////////////////////////////////////////// 
             
 
-            //DEFINISEM NIZ NIZOVA ENEMIES
+            //DEFINISEM LISTU LISTI ENEMIES
             //////////////////////////////////////////////////////////////////
             for(int i=0;i<5;i++)
             {
-                int column=(i%2==0) ? 5:8;
-                enemies[i]=new PictureBox[column];
+                int column=(i%2==0) ? shorter_row:longer_row;
+                enemies.Add(new List<PictureBox>(column));
                 for(int j=0;j<column;j++)
                 {    
-                    enemies[i][j] = new PictureBox();
+                    enemies[i].Add(new PictureBox());
                     enemies[i][j].Image=Properties.Resources.enemy;
                     enemies[i][j].Size = new Size(40,40);
                     enemies[i][j].BackColor=Color.Transparent;
@@ -62,21 +65,8 @@ namespace SPACE_SHOOTER
 
         }
 
-        private void When_Key_Down(object sender, KeyEventArgs e)
-        {
-            /*if (e.KeyCode == Keys.A)
-                player.Left-=15;
-            else if (e.KeyCode==Keys.D)
-                player.Left+=15;*/
-        }
-
-        private void When_Key_Pressed(object sender, KeyPressEventArgs e)
-        {
-          /*  if (e.KeyChar == 'a')
-                player.Left-=15;
-            else if (e.KeyChar=='d')
-                player.Left+=15;*/
-        }
+       
+       
 
         private void Form1_KeyUp(object sender, KeyEventArgs e)
         {
@@ -106,15 +96,23 @@ namespace SPACE_SHOOTER
 
         public void add_Bullet()
         {
-            PictureBox bullet = new PictureBox();
-            bullet.Width = 20;
-            bullet.Height=40;
-            bullet.Image=Properties.Resources.PLAYER_bullet;
-            bullet.BackColor=Color.Transparent;
-            bullet.SizeMode=PictureBoxSizeMode.StretchImage;
-            bullet.Location=new Point(player.Left+player.Width/2-bullet.Width/2,player.Top-bullet.Height);
-            my_bullets.Add(bullet);
-            Controls.Add(bullet);
+            if(my_bullets.Count<3)
+            {
+                PictureBox bullet = new PictureBox();
+                bullet.Width = 20;
+                bullet.Height=40;
+                bullet.Image=Properties.Resources.PLAYER_bullet;
+                bullet.BackColor=Color.Transparent;
+                bullet.SizeMode=PictureBoxSizeMode.StretchImage;
+                bullet.Location=new Point(player.Left+player.Width/2-bullet.Width/2, player.Top-bullet.Height);
+                my_bullets.Add(bullet);
+                Controls.Add(bullet);
+            }
+            else
+            {
+                lblNoBullets.Show();
+            }
+            
         }
 
 
@@ -126,21 +124,30 @@ namespace SPACE_SHOOTER
                 bool has_hit = false;
                 my_bullets[k].Top -= 45;
                 if(my_bullets[k].Top<0)
+                {
+                    Controls.Remove(my_bullets[k]);
                     my_bullets.RemoveAt(k);
+                    lblNoBullets.Hide();
+                }
+                    
                 else
                 {
                     for (int i = 0; i < 5; i++)
                     {
-                        int column = (i % 2 == 0) ? 5 : 8;
-                        for (int j = 0; j < column; j++)
+    
+                        for (int j = 0; j < enemies[i].Count; j++)
                         {
-                            if (my_bullets[k].Top <= enemies[i][j].Top)
+                            if (my_bullets[k].Bounds.IntersectsWith(enemies[i][j].Bounds))
                             {
                                 Controls.Remove(my_bullets[k]);
+                                Controls.Remove(enemies[i][j]);
                                 my_bullets.RemoveAt(k);
+                                enemies[i].RemoveAt(j);
                                 has_hit = true;
+                                lblNoBullets.Hide();
                                 break;
                             }
+                            
                         }
                         if (has_hit==true)
                             break;
@@ -165,7 +172,7 @@ namespace SPACE_SHOOTER
             int move_for_value =10; //50
             if (to_left[enemy_index]==true)
             {
-                if (enemies[enemy_index][0].Left-move_for_value>0)
+                if (enemies[enemy_index][0].Left-move_for_value>0) 
                 {
                     for (int j = 0; j<column; j++)
                         enemies[enemy_index][j].Left-=move_for_value;
@@ -176,7 +183,7 @@ namespace SPACE_SHOOTER
 
             else if (to_left[enemy_index]==false)
             {
-                if (enemies[enemy_index][column-1].Left+move_for_value+enemies[0][0].Width<Width)
+                if (enemies[enemy_index][column-1].Left+move_for_value+enemies[enemy_index][column-1].Width<Width) 
                 {
                     for (int j = column-1; j>=0; j--)
                         enemies[enemy_index][j].Left+=move_for_value;
@@ -188,28 +195,33 @@ namespace SPACE_SHOOTER
         }
         private void tmrEnemies_Tick(object sender, EventArgs e)
         {
-            Move_Enemies(0, 5);
+            if (enemies[0].Count>0)
+                 Move_Enemies(0, enemies[0].Count);
         }
   
         private void tmrEnemies2_Tick(object sender, EventArgs e)
         {
-            Move_Enemies(1, 8);
+            if (enemies[1].Count>0)
+                Move_Enemies(1, enemies[1].Count);
         }
 
         private void tmrEnemies3_tick(object sender, EventArgs e)
         {
-            Move_Enemies(2, 5);
+            if (enemies[2].Count>0)
+                Move_Enemies(2, enemies[2].Count);
             
         }
 
         private void tmrEnemies4_Tick(object sender, EventArgs e)
         {
-            Move_Enemies(3, 8);
+            if (enemies[3].Count>0)
+                Move_Enemies(3, enemies[3].Count);   
         }
 
         private void tmrEnemies5_Tick(object sender, EventArgs e)
         {
-            Move_Enemies(4, 5);
+            if (enemies[4].Count>0)
+                Move_Enemies(4, enemies[4].Count);  
         }
         ///////////////////////////////////////////////////////////////////////////
     }
