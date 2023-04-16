@@ -14,7 +14,7 @@ namespace SPACE_SHOOTER
     public partial class Form1 : Form
     {
         PictureBox player = new PictureBox();
-        List<List<PictureBox>> enemies = new List<List<PictureBox>>(5);
+        List<List<PictureBox>> enemies = new List<List<PictureBox>>();
         List<PictureBox> my_bullets= new List<PictureBox>();
         const int longer_row = 5;
         const int shorter_row = 3;
@@ -22,12 +22,14 @@ namespace SPACE_SHOOTER
         public Form1()
         {
             InitializeComponent();
-            /* WindowState = FormWindowState.Maximized;
-             Width=1900;
-             Height=980;*/
+            
+            //Kretanje picturebox-ova je vise smooth
+            DoubleBuffered=true;
 
             Width=800;
             Height=600;
+
+            //Postavljam labelu na sredini
             lblNoBullets.Left=Width/2-lblNoBullets.Width/2;
             lblNoBullets.Hide();
 
