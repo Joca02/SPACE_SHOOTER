@@ -19,6 +19,7 @@ namespace SPACE_SHOOTER
         const int longer_row = 5;
         const int shorter_row = 3;
 
+        bool game_active = true;
         public Form1()
         {
             InitializeComponent();
@@ -32,6 +33,8 @@ namespace SPACE_SHOOTER
             //Postavljam labelu na sredini
             lblNoBullets.Left=Width/2-lblNoBullets.Width/2;
             lblNoBullets.Hide();
+            lblLose.Hide();
+            lblWin.Hide();
 
             //DEFINISEM SPACESHIP IGRACA
             /////////////////////////////////////////////////////////////////
@@ -67,32 +70,52 @@ namespace SPACE_SHOOTER
 
         }
 
-       
-       
+        bool has_won;
+
+        private void tmrGame_Tick(object sender, EventArgs e)
+        {
+            if(game_active==false)
+            {
+                if(has_won==true)
+                {
+                    lblWin.Show();
+                }
+                else
+                {
+                    lblLose.Show();
+                }
+            }
+        }
 
         private void Form1_KeyUp(object sender, KeyEventArgs e)
         {
             int move_for_value = 50;
-            if (e.KeyCode == Keys.A)
+            if(game_active==true)
             {
-                if(player.Left-move_for_value>0)
-                    player.Left-=move_for_value;
-            }
-               
-           else if (e.KeyCode==Keys.D)
-            {
-                if (player.Left+move_for_value+player.Width<Width)
-                    player.Left+=move_for_value;
-            }
+                if (e.KeyCode == Keys.A)
+                {
+                    if (player.Left-move_for_value>0)
+                        player.Left-=move_for_value;
+                }
 
-            else if(e.KeyCode==Keys.Enter)
-            {
-                //postavi inicijalno tajmere da budu false pa ih ovim postavi na true
+                else if (e.KeyCode==Keys.D)
+                {
+                    if (player.Left+move_for_value+player.Width<Width)
+                        player.Left+=move_for_value;
+                }
+
+                else if (e.KeyCode==Keys.Enter)
+                {
+                    //postavi inicijalno tajmere da budu false pa ih ovim postavi na true
+                }
+                else if (e.KeyCode==Keys.Space)
+                {
+                    add_Bullet();
+                }
             }
-            else if(e.KeyCode==Keys.Space)
-            {
-                add_Bullet();
-            }
+            if (e.KeyCode == Keys.Escape)
+                this.Close();
+           
                
         }
 
@@ -203,10 +226,13 @@ namespace SPACE_SHOOTER
         {
             int maximum_bullets = 3;
             int enemies_alive = Enemies_alive();
+
             if (enemies_alive==2)
                 maximum_bullets=2;
-            else if(enemies_alive==1)
+            else if (enemies_alive==1)
                 maximum_bullets=1;
+            else if (enemies_alive==0)
+                return;
 
             Generate_Enemy_bullet(maximum_bullets);
         }
@@ -221,8 +247,12 @@ namespace SPACE_SHOOTER
                     enemies_alive++;
                 }
             }
-            if (enemies_alive==0)   //BRISI
-                this.Close();
+            if (enemies_alive==0)
+            {
+                has_won=true;
+                game_active=false;
+            }
+                
             return enemies_alive;
         }
 
@@ -298,8 +328,11 @@ namespace SPACE_SHOOTER
                 else if (enemy_bullets[k].Bounds.IntersectsWith(player.Bounds))
                 {
                     Controls.Remove(enemy_bullets[k]);
-                    Controls.Remove(player);
                     enemy_bullets.RemoveAt(k);
+                    player.Image=Properties.Resources.explosion;
+                    player.Size=new Size(50, 50);
+                    game_active=false;
+                    has_won=false;
                     break;
                 }
             }

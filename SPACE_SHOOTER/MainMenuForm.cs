@@ -27,5 +27,11 @@ namespace SPACE_SHOOTER
         {
             this.Close();
         }
+
+        private void button1_Click(object sender, EventArgs e)
+        {
+            MkayForm mkayForm = new MkayForm();
+            mkayForm.Show();
+        }
     }
 }
