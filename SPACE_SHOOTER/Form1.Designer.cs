@@ -98,9 +98,11 @@
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackgroundImage = global::SPACE_SHOOTER.Properties.Resources.pozadina;
-            this.ClientSize = new System.Drawing.Size(784, 560);
+            this.ClientSize = new System.Drawing.Size(784, 561);
             this.Controls.Add(this.lblNoBullets);
             this.MaximumSize = new System.Drawing.Size(800, 600);
+            this.MinimizeBox = false;
+            this.MinimumSize = new System.Drawing.Size(800, 600);
             this.Name = "Form1";
             this.Text = "Form1";
             this.KeyUp += new System.Windows.Forms.KeyEventHandler(this.Form1_KeyUp);
