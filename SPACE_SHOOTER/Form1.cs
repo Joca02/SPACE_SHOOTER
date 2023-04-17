@@ -281,7 +281,6 @@ namespace SPACE_SHOOTER
                 bullet_amount--;
                 tmr_enemy_bullets.Start();
             }
-            enemy_that_fires.Clear();
         }
         private void tmr_enemy_bullets_Tick(object sender, EventArgs e)
         {
