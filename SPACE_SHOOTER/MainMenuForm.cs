@@ -30,8 +30,14 @@ namespace SPACE_SHOOTER
 
         private void button1_Click(object sender, EventArgs e)
         {
-            MkayForm mkayForm = new MkayForm();
-            mkayForm.Show();
+            if (Form1.level_passed==true)
+            {
+                MkayForm mkayForm = new MkayForm();
+                mkayForm.Show();
+            }
+            else
+                MessageBox.Show("You need to finish Standard Level before Boss Level!");
+            
         }
     }
 }

@@ -13,6 +13,7 @@ namespace SPACE_SHOOTER
   
     public partial class Form1 : Form
     {
+        public static bool level_passed=false;
         PictureBox player = new PictureBox();
         List<List<PictureBox>> enemies = new List<List<PictureBox>>();
         List<PictureBox> my_bullets= new List<PictureBox>();
@@ -79,6 +80,7 @@ namespace SPACE_SHOOTER
                 if(has_won==true)
                 {
                     lblWin.Show();
+                    level_passed=true;
                 }
                 else
                 {
