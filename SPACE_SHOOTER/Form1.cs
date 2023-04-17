@@ -8,7 +8,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
-namespace SPACE_SHOOTER
+namespace SPACE_SHOOTER     
 {
   
     public partial class Form1 : Form
@@ -28,7 +28,7 @@ namespace SPACE_SHOOTER
 
             Width=800;
             Height=600;
-
+           
             //Postavljam labelu na sredini
             lblNoBullets.Left=Width/2-lblNoBullets.Width/2;
             lblNoBullets.Hide();
@@ -157,7 +157,7 @@ namespace SPACE_SHOOTER
                 }
                
             }
-        
+            Enemies_alive(); //kad crknu da mi se zatvori ekran
          }
 
 
@@ -169,61 +169,183 @@ namespace SPACE_SHOOTER
         //////////////////////////////////////////////////////////////////////////////////////////////
         bool[] to_left = { true, false, false, true, false };
         
-        void Move_Enemies(int enemy_index,int column)
+        void Move_Enemies(int enemy_row_index)
         {
-            int move_for_value =10; //50
-            if (to_left[enemy_index]==true)
+            int columns=enemies[enemy_row_index].Count;
+            int move_for_value =10; 
+            if (to_left[enemy_row_index]==true)
             {
-                if (enemies[enemy_index][0].Left-move_for_value>0) 
+                if (enemies[enemy_row_index][0].Left-move_for_value>0) 
                 {
-                    for (int j = 0; j<column; j++)
-                        enemies[enemy_index][j].Left-=move_for_value;
+                    for (int j = 0; j<columns; j++)
+                        enemies[enemy_row_index][j].Left-=move_for_value;
                 }
                 else
-                    to_left[enemy_index]=false;
+                    to_left[enemy_row_index]=false;
             }
 
-            else if (to_left[enemy_index]==false)
+            else if (to_left[enemy_row_index]==false)
             {
-                if (enemies[enemy_index][column-1].Left+move_for_value+enemies[enemy_index][column-1].Width<Width) 
+                if (enemies[enemy_row_index][columns-1].Left+move_for_value+enemies[enemy_row_index][columns-1].Width<Width) 
                 {
-                    for (int j = column-1; j>=0; j--)
-                        enemies[enemy_index][j].Left+=move_for_value;
+                    for (int j = columns-1; j>=0; j--)
+                        enemies[enemy_row_index][j].Left+=move_for_value;
                 }
                 else
-                    to_left[enemy_index] = true;
-
+                    to_left[enemy_row_index] = true;
+                
             }
         }
+
+        
+        
+        private void tmrGenerate_EnemyShot_Tick(object sender, EventArgs e)
+        {
+            int maximum_bullets = 3;
+            int enemies_alive = Enemies_alive();
+            if (enemies_alive==2)
+                maximum_bullets=2;
+            else if(enemies_alive==1)
+                maximum_bullets=1;
+
+            Generate_Enemy_bullet(maximum_bullets);
+        }
+
+        int Enemies_alive()
+        {
+            int enemies_alive = 0;
+            for (int i = 0; i<enemies.Count; i++)
+            {
+                for (int j = 0; j<enemies[i].Count; j++)
+                {
+                    enemies_alive++;
+                }
+            }
+            if (enemies_alive==0)   //BRISI
+                this.Close();
+            return enemies_alive;
+        }
+
+        List<PictureBox> enemy_bullets = new List<PictureBox>();
+        Random rand = new Random();
+
+        void Generate_Enemy_bullet(int bullet_amount)
+        {
+            bool first = true;
+            
+            List<PictureBox>enemy_that_fires=new List<PictureBox>();
+            while (bullet_amount!=0)
+            {
+                tmrEnemies.Stop();
+                tmrEnemies2.Stop();
+                tmrEnemies3.Stop();
+                tmrEnemies4.Stop();
+                tmrEnemies5.Stop();
+                bool already_firing = false;
+                int row;
+
+                do
+                {
+                    row = rand.Next(enemies.Count);
+                } while (enemies[row].Count==0);
+                
+                int column = rand.Next(enemies[row].Count);
+                if(first==true)
+                {
+                    enemy_that_fires.Add(enemies[row][column]);
+                    first=false;
+                }
+                else
+                {
+                    for(int i=0; i<enemy_that_fires.Count; i++)
+                    {
+                        if (enemies[row][column]==enemy_that_fires[i])
+                        {
+                            already_firing = true;
+                            break;
+                        }
+                    }
+                }
+                if (already_firing==true)
+                    continue;
+                enemy_that_fires.Add(enemies[row][column]);
+                PictureBox bullet = new PictureBox();
+                bullet.Width = 40;
+                bullet.Height=40;
+                bullet.Image=Properties.Resources.enemy_bullet;
+                bullet.BackColor=Color.Transparent;
+                bullet.SizeMode=PictureBoxSizeMode.StretchImage;
+                bullet.Location=new Point(enemies[row][column].Left, enemies[row][column].Top+enemies[row][column].Height);
+                enemy_bullets.Add(bullet);
+                Controls.Add(bullet);
+                bullet_amount--;
+                tmr_enemy_bullets.Start();
+            }
+            enemy_that_fires.Clear();
+        }
+        private void tmr_enemy_bullets_Tick(object sender, EventArgs e)
+        {
+            
+            for (int k = 0; k<enemy_bullets.Count; k++)
+            {
+                
+                enemy_bullets[k].Top += 30;
+                if (enemy_bullets[k].Top>Height)
+                {
+                    Controls.Remove(enemy_bullets[k]);
+                    enemy_bullets.RemoveAt(k);
+                }
+
+                else if (enemy_bullets[k].Bounds.IntersectsWith(player.Bounds))
+                {
+                    Controls.Remove(enemy_bullets[k]);
+                    Controls.Remove(player);
+                    enemy_bullets.RemoveAt(k);
+                    break;
+                }
+            }
+            if (enemy_bullets.Count==0)
+            {
+                tmrEnemies.Start();
+                tmrEnemies2.Start();
+                tmrEnemies3.Start();
+                tmrEnemies4.Start();
+                tmrEnemies5.Start();
+                tmr_enemy_bullets.Stop();
+            }
+                
+        }
+
+
         private void tmrEnemies_Tick(object sender, EventArgs e)
         {
             if (enemies[0].Count>0)
-                 Move_Enemies(0, enemies[0].Count);
+                 Move_Enemies(0);
         }
   
         private void tmrEnemies2_Tick(object sender, EventArgs e)
         {
             if (enemies[1].Count>0)
-                Move_Enemies(1, enemies[1].Count);
+                Move_Enemies(1);
         }
 
         private void tmrEnemies3_tick(object sender, EventArgs e)
         {
             if (enemies[2].Count>0)
-                Move_Enemies(2, enemies[2].Count);
+                Move_Enemies(2);
             
         }
 
         private void tmrEnemies4_Tick(object sender, EventArgs e)
         {
             if (enemies[3].Count>0)
-                Move_Enemies(3, enemies[3].Count);   
+                Move_Enemies(3);   
         }
 
         private void tmrEnemies5_Tick(object sender, EventArgs e)
         {
             if (enemies[4].Count>0)
-                Move_Enemies(4, enemies[4].Count);  
+                Move_Enemies(4);  
         }
         ///////////////////////////////////////////////////////////////////////////
     }
