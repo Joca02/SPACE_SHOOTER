@@ -80,6 +80,7 @@ namespace SPACE_SHOOTER
                 if(has_won==true)
                 {
                     lblWin.Show();
+                    tmr_enemy_bullets.Stop();
                     level_passed=true;
                 }
                 else
@@ -106,10 +107,6 @@ namespace SPACE_SHOOTER
                         player.Left+=move_for_value;
                 }
 
-                else if (e.KeyCode==Keys.Enter)
-                {
-                    //postavi inicijalno tajmere da budu false pa ih ovim postavi na true
-                }
                 else if (e.KeyCode==Keys.Space)
                 {
                     add_Bullet();
@@ -159,7 +156,7 @@ namespace SPACE_SHOOTER
                     
                 else
                 {
-                    for (int i = 0; i < 5; i++)
+                    for (int i = 0; i < enemies.Count; i++)
                     {
     
                         for (int j = 0; j < enemies[i].Count; j++)
@@ -182,7 +179,7 @@ namespace SPACE_SHOOTER
                 }
                
             }
-            Enemies_alive(); //kad crknu da mi se zatvori ekran
+            Enemies_alive(); //kad nestanu da mi se registruje
          }
 
 
@@ -190,7 +187,7 @@ namespace SPACE_SHOOTER
 
 
         //ZA SVAKI ENEMY RED IMAM PO TAJMER KAKO BI SE POMERANJE BRZE IZVRSILO + KAKO BI PLAYER MOGAO DA REAGUJE NA KOMANDE
-        //SA TASTATURE SA STO MANJIM KASNJENJEM
+        //SA TASTATURE SA STO MANJIM KASNJENJEM + SVE VEZANO ZA ENEMY LOGIKU
         //////////////////////////////////////////////////////////////////////////////////////////////
         bool[] to_left = { true, false, false, true, false };
         
